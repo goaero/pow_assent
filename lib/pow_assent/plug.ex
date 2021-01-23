@@ -299,7 +299,7 @@ defmodule PowAssent.Plug do
   @spec authenticate(Conn.t(), map()) :: {:ok, Conn.t()} | {:error, Conn.t()}
   def authenticate(conn, %{"provider" => provider, "uid" => uid}) do
     config = fetch_config(conn)
-    provider = "google"
+    provider = convert_provider(provider)
 
     provider
     |> Operations.get_user_by_provider_uid(uid, config)
@@ -308,6 +308,8 @@ defmodule PowAssent.Plug do
       user -> {:ok, create_session(conn, user, provider, config)}
     end
   end
+
+  defp convert_provider(provider), do: if(provider == "google_ios", do: "google", else: provider)
 
   defp create_session(conn, user, %{"provider" => provider}, config),
     do: create_session(conn, user, provider, config)
